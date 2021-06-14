@@ -62,12 +62,13 @@ class Blockchain {
      * Note: the symbol `_` in the method name indicates in the javascript convention
      * that this method is a private method.
      */
-    _addBlock(block) {
+     _addBlock(block) {
         let self = this;
         return new Promise(async (resolve, reject) => {
             if( self.height >= 0){
-                block.previousBlockHash = self.getBlockByHeight(self.height-1).hash;
-                console.log("previous hash", self.chain)
+                let previousBlock = await self.getBlockByHeight(self.height)
+                block.previousBlockHash = previousBlock.hash;
+                console.log("previous hash", block.previousBlockHash.hash)
             }
             block.time = new Date().getTime().toString().slice(0,-3);
             block.height = self.height+1;
