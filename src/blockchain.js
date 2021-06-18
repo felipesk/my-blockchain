@@ -75,9 +75,15 @@ class Blockchain {
             block.hash = SHA256(JSON.stringify(block)).toString();
             //add block to the chain
             self.chain.push(block);
-            // update height
-            self.height++;
-            resolve(block);
+            let validationErrors = await self.validateChain();
+            if(validationErrors.length === 0){
+                // update height
+                self.height++;
+                resolve(block);
+            }else{
+                reject(validationErrors);
+            }
+            
         });
     }
 
@@ -194,15 +200,23 @@ class Blockchain {
         let self = this;
         let errorLog = [];
         return new Promise(async (resolve, reject) => {
-            self.chain.every((block,i) => {
+            
+            self.chain.every((block,i,chain) => {
                 if(!block.validate()){
                     errorLog.push({block: "is invalid"})
+                    resolve(errorLog)
+                    return false
                 }
-                if(block.previousBlockHash != self.chain[i-1].hash){
-                    errorLog.push({block: "Has wrong previous block hash. Blockchain invalid!"})
+                if(block.height>0){
+                    if(block.previousBlockHash != chain[i-1].hash){
+                        errorLog.push({block: "Has wrong previous block hash. Blockchain invalid!"})
+                        resolve(errorLog) 
+                        return false
+                    }
                 }
-            })  
-            resolve(errorLog) 
+                resolve(errorLog)
+            }) 
+            
         });
     }
 
