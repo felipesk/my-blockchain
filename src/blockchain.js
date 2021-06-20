@@ -124,8 +124,8 @@ class Blockchain {
         return new Promise(async (resolve, reject) => {
           let timeSent = parseInt(message.split(':')[1]);
           let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
-          if((currentTime-timeSent)<5000){
-            console.log("Time elapsed is more than 5 seconds");
+          if((currentTime-timeSent)>300){
+            console.log("Time elapsed is more than 5 minutes");
           };
           if(!bitcoinMessage.verify(message, address, signature)){
             resolve("Couldn't verify Bitcoin Message");
@@ -149,7 +149,7 @@ class Blockchain {
     getBlockByHash(hash) {
       let self = this;
       return new Promise((resolve, reject) => {
-        resolve(self.chain.filter(h => h == hash))
+        resolve(self.chain.filter(h => h.hash == hash))
       });
     }
 
